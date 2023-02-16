@@ -1,7 +1,244 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 1 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Project 1: Rasterizer</h1>
+<h2 align="middle">Yuntian Ke, Ruichi Zhang</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>In this project, we learned how to break down a triangle into individual pixels and determine which ones should be colored. 
+  Besides, we learned how to use supersampling to do antialiasing. 
+  We also learned how to transform objects by rotating, scaling, and translating them in 2D space. 
+  In addition, we used Barycentric coordinates to draw triangles, which helped me to determine the position, color and many other information of a point within a triangle based on its distance from the triangle's vertices. 
+  Finally, we incorporated pixel sampling and level sampling to ensure antialiasing with few revels per pixel and an efficient antialiasing. Overall, the project allowed us to combine different computer graphics techniques to create a more immersive and interactive scene.</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/bugart.png" align="middle" width="400px"/>
+        <figcaption align="middle">bug art</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+
+<h2 align="middle">Section I: Rasterization</h2>
+
+<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+
+<p>We resterize triangles with 'rasterize_triangle()' function, which use (x+0.5,y+0.5) to represent every pixel at (x,y), then check that whether this point (x+0.5,y+0.5) is in this triangle. If it is in the triangle, fill this pixel with the given color.</p>
+<p>We find the minimum and maximum values of x and y for those three vertices of the triangle, so that we only check points in a bounding box with length of max(x) - min(x) and height of max(y) - min(y).</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/imagea.png" align="middle" width="400px"/>
+        <figcaption align="middle">Rasterizing triangles</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p>These pictures shows that when sample rate is increasing, the effect of anti-aliasing is more significant, because when having more sub-pixels, the filter has more chance to remove high frequency components through averaging among more sub-pixels.</p>
+
+<h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+
+<p>Supersampling is useful since it removes high frequency components by sampling multiple sub-pixels within each pixel and averaging the results. As it increases the resolution of an image, it improves the clarity and detail of the image.</p>
+<p>We modified 'rasterize_triangle()' function by letting both x and y multiply sqrt(sample_rate), then check whether those sub-pixels are in the triangle, and store these corresponding colors in sample_buffer. We increase the size of the sample buffer by sample rate, so that we can store every sub-pixels in our sample buffer. And we change the 'pixel_fill()' fuction to make rasterizing points and lines every sub-pixels without supersampling. At last, we change 'resolve_to_framebuffer()' to average every pixel's color.</p>
+<p>To use supersampling to antialias our triangles, we store every sub-pixels color in sample buffer, in 'RasterizerImp::resolve_to_framebuffer()' function. Then we traverse every sub-pixels in one pixel, and summing those color. Then average the color of this pixel by multiplying color with (1/ sample_rate). At the end, store this final color into 'rgb_framebuffer_target'. </p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/1-rate.png" align="middle" width="400px"/>
+        <figcaption align="middle">Supersample rate 1 per pixel</figcaption>
+      </td>
+      <td>
+        <img src="images/4-rate.png" align="middle" width="400px"/>
+        <figcaption align="middle">Supersample rate 4 per pixel</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/9-rate.png" align="middle" width="400px"/>
+        <figcaption align="middle">Supersample rate 9 per pixel</figcaption>
+      </td>
+      <td>
+        <img src="images/16-rate.png" align="middle" width="400px"/>
+        <figcaption align="middle">Supersample rate 16 per pixel</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+
+
+
+<h3 align="middle">Part 3: Transforms</h3>
+<p>We appply transform matrix to this cubeman. The left one We rotate his arms and legs to make him do Cristiano Ronaldo's classic move. The right one we transform and scale his arms to make him as strong as Lebron, and rotate his arms to hold his crown, for he has become the all-time score leader. </p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/Ronaldo.png" align="middle" width="400px"/>
+        <figcaption align="middle">Cristiano Ronaldo 'siuuuu~'</figcaption>
+      </td>
+      <td>
+        <img src="images/Lebron.png" align="middle" width="400px"/>
+        <figcaption align="middle">Lebron James holds his crown</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Section II: Sampling</h2>
+
+<h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+<p>Barycentric coordinates are a way to represent points in a triangle, using three vertices to indicate relative distances of these three vertices from those points. It can include information from three vertices such as positions, color, texture coordinates, normal vectors by multiplying each proportion with the value of corresponding vertex. When a point is closer to a vertex, it can gain more information from this vertex.</p>
+<p>Any point V in triangle can be represented as V = aV1 + bV2 + cV3, where V1,V2 and V3 are three vertices and a+b+c=1. V1,V2,V3 can be positions, color, texture coordinates, normal vectors and so on.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/a.png" align="middle" width="400px"/>
+        <figcaption align="middle">smoothly blended color triangle</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>For example, in the picture above, this triangle has three vertices which are red, blue and green. We can produce a smoothly blended color triangle by multiplying each proportion with the color of corresponding vertex.</p>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/part4.png" align="middle" width="400px"/>
+        <figcaption align="middle">Barycentric coordinates circle</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+<p>Pixel sampling is the process that we sample the pixel in the screen space and map the color from the corresponding texture to it. 
+  To implement pixel sampling to perform texture mapping, we first sample (x,y) from the screen space, then we could compute its barycentric coordinates. 
+  Note that we also have the normalized coordinate of triangle vertices (u,v), thus we can compute the corresponding position in the texture using barycentric coordinates, which remains the same in screen and texture space. Then, we could map the color in the texture to the sample point in the screen space.
+<br><br>
+There are two different pixel sampling method, the relatively simple one is called “nearest sampling”, which simply finds the nearest sample location to our sample point. 
+The other method is called “bilinear sampling”, which takes 4 nearest locations and using a “lerp” function to interpolate four texture values.</p>
+
+<div align="middle">
+  <table style="width=200%">
+    <tr>
+      <td>
+        <img src="images/near-1.png" align="middle" width="400px"/>
+        <figcaption align="middle">Nearest sampling, supersampling rate = 1.</figcaption>
+      </td>
+      <td>
+        <img src="images/bilinear-1.png" align="middle" width="400px"/>
+        <figcaption align="middle">Bilinear sampling, supersampling rate = 1.</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/near-16.png" align="middle" width="400px"/>
+        <figcaption align="middle">Nearest sampling, supersampling rate = 16.</figcaption>
+      </td>
+      <td>
+        <img src="images/bilinear-16.png" align="middle" width="400px"/>
+        <figcaption align="middle">Bilinear sampling, supersampling rate = 16.</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<br> <p>We can see from the above pictures that the difference is large when supersampling rate = 1, where the line is even seemed disconnected 
+when we use nearest sampling. However, the difference becomes small when supersampling rate = 16. <br>
+We can conclude that bilinear sampling is much better than nearest sampling for thin curves, especially 
+when the source image has low resolution, i.e, the sampling rate is low.
+It is because when the sampling rate is low, there are not enough pixels to form the shape, thus the "interpolating" property of bilinear sampling has a larger antialiasing effect.
+On the other hand, when the sampling rate is high, the antialising effect of bilinear sampling becomes less obvious since we have already sampled enough pixels to recover the original shape.</p>
+
+<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+<p> When we sample texture values from different levels of a mipmap, we are doing level sampling. Higher level of a mipmap stores texture with lower resolution. 
+  Note that a small area of screen space could be mapped to a large area of texture space. 
+  In this case, the cost would be extremely high, so we want to sample from a low resolution texture, i.e., high levels of the mipmap.
+<br><br>
+  To implement level sampling, we first need to compute the proper level for a sample point to sample from. 
+  This step can be done by the get_level() function, which computes partial derivatives from the uv barycentric coordinate of (x,y), (x+1,y) and (x,y+1) and 
+  then takes log2 of the maximum absolute square sum of each partial derivatives to get the appropriate mipmap level. 
+  Then, we could sample from that particular level, which could save much time. The image quality is also improved since using mipmap 
+  help eliminate aliasing effects caused by oversampling textures.
+  We can either choose the nearest appropriate mipmap level, or take the mipmap level as a continuous number, then compute a weighted sum of using one sample from each of the adjacent mipmap levels.</p>
+<p>
+There are tradeoffs between speed, memory usage, and antialiasing power between pixel sampling, level sampling and supersampling.
+For the speed, pixel sampling is faster than supersampling, using level sampling could also increase the rendering speed. With a high sample rate per pixel,
+supersampling could be very low. For the memory usage, using mipmap would take an additional 33% of memory to store difference levels of mipmap.
+For the antialiasing power, supersampling does a better job than level sampling.</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/l0n.png" align="middle" width="400px"/>
+        <figcaption align="middle">Nearest sampling, level = 0.</figcaption>
+      </td>
+      <td>
+        <img src="images/l0b.png" align="middle" width="400px"/>
+        <figcaption align="middle">Bilinear sampling, level = 0.</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/lnn.png" align="middle" width="400px"/>
+        <figcaption align="middle">Nearest sampling, level = nearest.</figcaption>
+      </td>
+      <td>
+        <img src="images/lnb.png" align="middle" width="400px"/>
+        <figcaption align="middle">Bilinear sampling, level = nearest.</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<p> We can see that without level sampling (level = 0), there are jaggies when rasterizing lines. Performing level sampling could solve the "jaggies" problem, however, it
+  might overblur the area in the distance. This problem can be solved by other techniques such as EWA filtering.
+</p>
+
+</body>
 </html>
