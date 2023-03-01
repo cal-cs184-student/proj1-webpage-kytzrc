@@ -246,6 +246,11 @@
 <b>
   Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used.
 </b>
+<div align="middle">
+  <img src="images/split.png" align="middle" width="100%">
+  <figcaption align="middle">before and after edge split graphs</figcaption>
+</div>
+<br>
 <p>
   To apply edge split, we follow steps in spec. First, we have an original graph, which contains the pair of triangles (a, b, c ) and (a, d, b). And we draw the graph after applying edge split. Different from part 4, we need to allocate new edge, vertex, face, half-edge in this part. From the graph, we know that we need 16 half-edges, 8 edges, 5 vertices, 4 faces now. So, we need to create 6 more half-edges, 3 more edges, 1 more vertex, 2 more faces. We can create them use instructions such as HalfedgeIter h01 = newHalfedge(); The step of collecting these elements can be same as part 4. But during the reassignment, we need to update pointes for those new elements also. Just as what we do in part 4, follow a specific order to update those pointers so that it can be clear for us to find the problem. Besides, we also need to assign the position of this new vertex m. It should be set as the midpoint of a and b in below picture.
 
