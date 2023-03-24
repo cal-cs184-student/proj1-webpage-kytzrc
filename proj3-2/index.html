@@ -1,7 +1,243 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-2 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <style>
+        body {
+          background-color: white;
+          padding: 100px;
+          width: 1000px;
+          margin: auto;
+          text-align: left;
+          font-weight: 300;
+          font-family: 'Open Sans', sans-serif;
+          color: #121212;
+        }
+        h1, h2, h3, h4 {
+          font-family: 'Source Sans Pro', sans-serif;
+        }
+        kbd {
+          color: #121212;
+        }
+        p.big {line-height:150%;}
+      </style>
+<title>Ruichi Zhang & Yuntian Ke  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3-2: Additional Features to PathTracer</h1>
+    <h2 align="middle">Your Name</h2>
+    <h2 align="middle">Website URL: <a href="https://richardzhang0610.github.io/proj1-webpage-kytzrc/proj3-2/index.html">https://richardzhang0610.github.io/proj1-webpage-kytzrc/proj3-2/index.html</a></h2>
+
+    <div class="padded">
+
+        
+        * NOTE: For this project, you will choose TWO out of the four given parts to complete. One of those parts must be Part 1 or Part 2. In other words, you can choose any combination of two parts except the pair (Part 3, Part 4).
+
+
+        <h3 align="middle">Part 1. Mirror and Glass Materials</h3>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres0.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 0</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+
+        <p>
+            When max_ray_depth = 0, there are only zero bounce radiance, which is the radiance directly emitted from the light source.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres1.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 1</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            Due to one bounce radiance, we could see the light which is reflected by the spheres as well as most part of the background. However, since only one bounce is allowed, there are 
+            neither refraction effect nor reflection from other objects, so the most part of spheres remains black.
+        </p>
+        
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres2.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 2</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            First we notice that the ceiling is lightened up. Because it is parallel to the light source, it requires at least two bounce for the light ray to hit the ceiling and 
+            arrive at the camera. Then, since two bounce radiance is introduced, we could trace the ray which first hit the wall and then reflected by the sphere, so we could see the 
+            reflection of the scene on the sphere on the left. However, for the same reason as above, the reflection of the ceiling remains black. For the sphere on the right, we can speculate
+            that its material is mostly refractive, so we need more than two bounces to see though the shpere, however, we can still see minor reflection on it.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres3.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 3</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            We can see the reflection of the ceiling has color now, this is because we are now able to trace rays that come from the ceiling and reflected by the shpere, which is a three-bounce
+            ray. For the shpere on the right, we can see the wall through it now, because we are now able to trace three-bounce ray which first hit the wall and then go through the shpere 
+            via two refraction. In addition, we can also see the light which directly pass through the sphere, instead of the whole black shadow.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres4.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 4</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            The most conspicuous change is that the reflection of the right sphere in the left sphere is glassy now, rather than completely dark in the previous image. This is because 
+            we are now able to trace rays which first hit the right wall, passing through the right sphere and eventually reflected by the left sphere, and this is also the reason why 
+            the reflection of the right sphere looks blue. We can also see the right shpere rafracts the light on the wall next to it.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres5.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 5</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            The scene looks brighter.
+        </p>    
+        
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/spheres100.png" width="480px" />
+                    <figcaption align="middle">max_ray_depth = 100</figcaption>
+                </tr>
+            </table>
+          </div>
+        <br>
+        
+        <p>
+            The scene looks brighter. More light are refracted by the right shpere rather than being reflected, so the reflection of the light on the right shpere looks more blurred.
+        </p>  
+
+        <h3 align="middle">Part 2. Microfacet Material</h3>
+        <p><b>
+            Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to. 
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        
+        
+        
+
+        <h3 align="middle">Part 3. Environment Lightl</h3>
+        <b>Pick one *.exr* file to use for all subparts here. Include a converted *.jpg* of it in your website so we know what map you are using.</b>
+        
+        <p><b>
+            In a few sentences, explain the ideas behind environment lighting (i.e. why we do it/how it works).
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Show the *probability_debug.png* file for the *.exr* file you are using, generated using the `save_probability_debug()` helper function after initializing your probability distributions.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Use the `bunny_unlit.dae` scene and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Use a different image (if you did part 2, we recommend `bunny_microfacet_cu_unlit.dae`) and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+
+
+
+        <h3 align="middle">Part 4. Depth of Field</h3>
+        <b>
+            For these subparts, we recommend using a microfacet BSDF scene to show off the cool out of focus effects you can get with depth of field!
+        </b>
+        <p><b>
+            In a few sentences, explain the differences between a pinhole camera model and a thin-lens camera model. 
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Show a "focus stack" where you focus at 4 visibly different depths through a scene. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+        <p><b>
+            Show a sequence of 4 pictures with visibly different aperture sizes, all focused at the same point in a scene. Make sure to include all screenshots.
+        </b></p>
+        <p>
+            Your response goes here.
+        </p>
+        <br>
+
+    </div>
+</body>
 </html>
+
