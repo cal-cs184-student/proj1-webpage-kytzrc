@@ -156,86 +156,103 @@
             Show a screenshot sequence of 4 images of scene `CBdragon_microfacet_au.dae` rendered with $\alpha$ set to 0.005, 0.05, 0.25 and 0.5. The other settings should be at least 128 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Describe the differences between different images. Note that, to change the $\alpha$, just open the .dae file and search for `microfacet`.
         </b></p>
         <p>
-            Your response goes here.
+            Images below are 128 samples per pixel and 1 samples per light. The number of bounces are at 7. 
+        </p>
+        <div align="middle">
+            <table style="width=100%">
+             <tr>
+            <td>
+             <img src="images/dragon0.005.png" align="middle" width="400px"/>
+             <figcaption align="middle">alpha = 0.005</figcaption>
+            </td>
+            <td>
+             <img src="images/dragon0.05.png" align="middle" width="400px"/>
+             <figcaption align="middle">alpha = 0.05</figcaption>
+            </td>
+             </tr>
+             <tr>
+            <td>
+             <img src="images/dragon0.25.png" align="middle" width="400px"/>
+             <figcaption align="middle">alpha = 0.25</figcaption>
+            </td>
+            <td>
+             <img src="images/dragon0.5.png" align="middle" width="400px"/>
+             <figcaption align="middle">alpha = 0.5</figcaption>
+            </td>
+             </tr>
+            </table>
+            </div>
+                    <br>
+        <p>
+            the first is with the least alpha(alpha = 0.005), it is the darkest one, and it show more red and purple color on dragons' body, compared with other three's.
+        </p>
+        <p>
+            the second one is with the alpha = 0.05. it is less dark.(we can see this from the back of the dragon). it is less noisy, which we can figure out that low alpha always bring more noise.
+        </p>
+        <p>
+            the third one is with alpha = 0.25. it is less dark when compared with first two images. it is affected by the global illumination less with first two images, because you can see less red color on the left side, and less purple color on the right side.
+        </p>
+        <p>
+            the last one is with the highest alpha (alpha = 0.5). it is the least noisy one, and the dragon is kind of matte.
+        </p>
+        <p>
+            High alpha values can lead to a matte appearance. Low alpha values indicates the material is smoother.
         </p>
         <br>
         <p><b>
             Show two images of scene `CBbunny_microfacet_cu.dae` rendered using cosine hemisphere sampling (default) and your importance sampling. The sampling rate should be fixed at 64 samples per pixel and 1 samples per light. The number of bounces should be at least 5. Briefly discuss their difference.
         </b></p>
         <p>
-            Your response goes here.
+            Images below are 64 samples per pixel and 1 samples per light. The number of bounces are at 7. 
+        </p>
+        <div align="middle">
+            <table style="width=100%">
+             <tr>
+            <td>
+             <img src="images/bunny1.png" align="middle" width="400px"/>
+             <figcaption align="middle">cosine hemisphere sampling</figcaption>
+            </td>
+            <td>
+             <img src="images/bunnyimpor.png" align="middle" width="400px"/>
+             <figcaption align="middle">importance sampling</figcaption>
+            </td>
+             </tr>
+            </table>
+            </div>
+            <br>
+        <p>
+            Cosine hemisphere converge more slowly than importance sampling. Bunny is much noisier with cosine hemisphere sampling.
         </p>
         <br>
         <p><b>
             Show at least one image with some other conductor material, replacing `eta` and `k`. Note that you should look up values for real data rather than modifying them arbitrarily. Tell us what kind of material your parameters correspond to. 
         </b></p>
         <p>
-            Your response goes here.
+            Images below are 128 samples per pixel and 1 samples per light. The number of bounces are at 7. We use silver as our new conductor mterial. we have searchered that  eta = (0.059193 0.059881 0.047366), k = (4.1283 3.5892 2.8132).
         </p>
+        <div align="middle">
+            <table style="width=100%">
+             <tr>
+            <td>
+             <img src="images/dragonsilver0.05.png" align="middle" width="400px"/>
+             <figcaption align="middle">silver with alpha=0.05</figcaption>
+            </td>
+            <td>
+             <img src="images/dragonsilver.png" align="middle" width="400px"/>
+             <figcaption align="middle">silver with alpha=0.5</figcaption>
+            </td>
+             </tr>
+            </table>
+            </div>
+            <br>
         <br>
         
         
         
 
-        <h3 align="middle">Part 3. Environment Lightl</h3>
-        <b>Pick one *.exr* file to use for all subparts here. Include a converted *.jpg* of it in your website so we know what map you are using.</b>
-        
-        <p><b>
-            In a few sentences, explain the ideas behind environment lighting (i.e. why we do it/how it works).
-        </b></p>
         <p>
-            Your response goes here.
+            Each of us finish a task. then we communicated about the process of our task, described what we have done about this task, so that both of us will learn both tasks. We learn how to render objects with more complicated materials.
         </p>
-        <br>
-        <p><b>
-            Show the *probability_debug.png* file for the *.exr* file you are using, generated using the `save_probability_debug()` helper function after initializing your probability distributions.
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
-        <p><b>
-            Use the `bunny_unlit.dae` scene and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
-        <p><b>
-            Use a different image (if you did part 2, we recommend `bunny_microfacet_cu_unlit.dae`) and your environment map *.exr* file and render two pictures, one with uniform sampling and one with importance sampling. Use 4 samples per pixel and 64 samples per light in each. Compare noise levels. Make sure to include all screenshots.
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
-
-
-
-        <h3 align="middle">Part 4. Depth of Field</h3>
-        <b>
-            For these subparts, we recommend using a microfacet BSDF scene to show off the cool out of focus effects you can get with depth of field!
-        </b>
-        <p><b>
-            In a few sentences, explain the differences between a pinhole camera model and a thin-lens camera model. 
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
-        <p><b>
-            Show a "focus stack" where you focus at 4 visibly different depths through a scene. Make sure to include all screenshots.
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
-        <p><b>
-            Show a sequence of 4 pictures with visibly different aperture sizes, all focused at the same point in a scene. Make sure to include all screenshots.
-        </b></p>
-        <p>
-            Your response goes here.
-        </p>
-        <br>
 
     </div>
 </body>
