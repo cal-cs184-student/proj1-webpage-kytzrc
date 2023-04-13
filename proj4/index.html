@@ -1,7 +1,446 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 4 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2017</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Ruichi Zhang, CS184-SP23</h2>
+<h2 align="middle">Website URL: <a href="https://richardzhang0610.github.io/proj1-webpage-kytzrc/proj4/index.html">https://richardzhang0610.github.io/proj1-webpage-kytzrc/proj4/index.html</a></h2>
+
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>In this project we implement cloth simulation. First, we build the frame of the cloth which contains point masses and springs, where masses represent
+  the pysical component and springs provide constrains which connect nearby masses. Then, we apply forces to the masses and use Verlet integration to 
+  efficiently simulate the change of the position of the masses and apply constrain position updates to prevent oversretching. Then, we handled 
+  collision with other projects by adjusting the position of the masses to where it is supposed to be. We also handled self collision using a hash map 
+  to accelerate the loop process. At last, we implement shaders(vertex shader and fragment shader) to to render different realistic material appearances(diffuse, Blinn-Phong, mirror, etc).
+</p>
+
+<h2 align="middle">Part I: Masses and springs</h2>
+<p>
+  In this part we built a grid of masses and springs. First, we created a grid of masses according to its orietation and store them in 
+  row major order, and then set the boolean of all the pinned mass points to be true. Then, we created springs to apply the structual, shear, 
+  and bending constraints between point masses respectively.
+</p>
+  <b>Take some screenshots of scene/pinned2.json from a viewing angle where you can clearly see the cloth wireframe to show the structure of your point masses and springs.</b>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/overall.png" align="middle" width="700px"/>
+        <figcaption align="middle">wireframe structure</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<b>Show us what the wireframe looks like (1) without any shearing constraints, (2) with only shearing constraints, and (3) with all constraints</b>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr align="center">
+      <td>
+        <img src="images/without.png" align="middle" width="500px"/>
+        <figcaption align="middle">without any shearing constraints</figcaption>
+      </td>
+      <td>
+        <img src="images/withonly.png" align="middle" width="500px"/>
+        <figcaption align="middle">with only shearing constraints</figcaption>
+      </td>
+    </tr>
+    <tr align="center">
+      <td>
+        <img src="images/all.png" align="middle" width="500px"/>
+        <figcaption align="middle">with all constraints</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+<p>
+  We first computed the total external forces based on the external accelerations and the mass. Then, we applied the spring correction
+  forces using Hooke's law. Then, we chose to use Verlet integration to compute new mass positions. At last, constrain position updates is applied
+  by correcting the two point masses' positions such that the spring's length is at most 10% greater than its rest_length at the end of any time step. 
+</p>  
+
+<b>Spring Constant ks (0, 5000, 50000)</b>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/ks0.mp4" type="video/mp4">
+          <object data="ks0.mp4" width="500" height="240">
+              <embed width="420" height="300" src="ks0.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/ks5000.mp4" type="video/mp4">
+          <object data="ks5000.mp4" width="500" height="240">
+              <embed width="420" height="300" src="ks5000.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/ks50000.mp4" type="video/mp4">
+          <object data="ks50000.mp4" width="500" height="240">
+              <embed width="420" height="300" src="ks50000.mp4">
+          </object>
+        </video>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  Higher ks means the cloth has more internal force in it and thus harder to stretch. 
+  Therefore, cloth with lower ks is more flexible and has more wrinkles.
+</p>
+<b>Density (1, 15, 100)</b>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/dens1.mp4" type="video/mp4">
+          <object data="dens1.mp4" width="500" height="240">
+              <embed width="420" height="300" src="den1.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/ks5000.mp4" type="video/mp4">
+          <object data="ks5000.mp4" width="500" height="240">
+              <embed width="420" height="300" src="ks5000.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/dens100.mp4" type="video/mp4">
+          <object data="dens100.mp4" width="500" height="240">
+              <embed width="420" height="300" src="dens100.mp4">
+          </object>
+        </video>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  The higher the density is, the more the cloth is affected by gravity. We can see that the middle part of the cloth with higher density 
+  is lower. However, our position constrain make sure that the cloth will not be overstretched too much so higher density actually have a gradually
+  decreased affect.
+</p>
+
+<b>Damping (0.05, 0.2, 0.50)</b>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/damp0.0.mp4" type="video/mp4">
+          <object data="damp0.0.mp4" width="500" height="240">
+              <embed width="420" height="300" src="damp0.0.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/ks5000.mp4" type="video/mp4">
+          <object data="ks5000.mp4" width="500" height="240">
+              <embed width="420" height="300" src="ks5000.mp4">
+          </object>
+        </video>
+      </td>
+      <td>
+        <video width="300" height="300" controls autoplay>
+          <source src="videos/damp50.mp4" type="video/mp4">
+          <object data="damp50.mp4" width="500" height="240">
+              <embed width="420" height="300" src="damp50.mp4">
+          </object>
+        </video>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  Damp coefficient controls how the cloth wobbles. With a low damp coefficient, the cloth will swing more erratically and last for a long time.
+  However, with a high damp coefficient, the cloth barely swing and quickly fell down and became stable.
+</p>
+
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/pinned4.png" align="middle" width="700px"/>
+        <figcaption align="middle">pinned4.json in its final resting state</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<h2 align="middle">Part III: Handling collisions with other objects</h2>
+<p>
+  In this part we make sure that the cloth will act normally when colliding with shperes and planes.
+  For spheres, we examine each point mass and force it to bump it up to the surface of the shpere when colliding with it.
+  For planes, we adjust the point mass' position, bumping it back when it crossover the plane.
+</p>
+
+<b>Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.</b>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/500ks.png" align="middle" width="300px"/>
+        <figcaption align="middle">ks = 500</figcaption>
+      </td>
+      <td>
+        <img src="images/5000ks.png" align="middle" width="300px"/>
+        <figcaption align="middle">ks = 5000</figcaption>
+      </td>
+      <td>
+        <img src="images/50000ks.png" align="middle" width="300px"/>
+        <figcaption align="middle">ks = 50000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  As we can see, when ks is small, the cloth is more drooping and wraps the shpere more tightly. However, when the ks become larger, the internal 
+  force within the cloth will resist the gravity that make the cloth droop and hold the cloth from dangling more.
+</p>
+
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/mirrorplane.png" align="middle" width="700px"/>
+        <figcaption align="middle">Mirror lying peacefully</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h2 align="middle">Part IV: Handling self-collisions</h2>
+<p>
+  In this part we deal with self collision problem. We implement spatial hashing which maps a float to a vector of PointMass* contains all of the point masses that are in that 3D box volume.
+  Then we can simply loop through the point masses and check the point masses that share the same 3D volume and then apply a collision force to 
+  any pair of point masses that are too close to each other.
+</p>  
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/initial.png" align="middle" width="300px"/>
+        <figcaption align="middle">Initial state</figcaption>
+      </td>
+      <td>
+        <img src="images/middle.png" align="middle" width="300px"/>
+        <figcaption align="middle">midway</figcaption>
+      </td>
+      <td>
+        <img src="images/last.png" align="middle" width="300px"/>
+        <figcaption align="middle">final state</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<b>Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</b>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/selfdense1.png" align="middle" width="300px"/>
+        <figcaption align="middle">Density = 1</figcaption>
+      </td>
+      <td>
+        <img src="images/selfks5000.png" align="middle" width="300px"/>
+        <figcaption align="middle">Density = 15</figcaption>
+      </td>
+      <td>
+        <img src="images/selfdense100.png" align="middle" width="300px"/>
+        <figcaption align="middle">Density = 100</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  The number of fold increases as the density goes higher. That is because higher density will make the cloth fall harder and faster, which 
+  will naturally generate more folds. 
+</p>  
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/selfks50.png" align="middle" width="300px"/>
+        <figcaption align="middle">Ks = 50</figcaption>
+      </td>
+      <td>
+        <img src="images/selfks5000.png" align="middle" width="300px"/>
+        <figcaption align="middle">Ks = 50</figcaption>
+      </td>
+      <td>
+        <img src="images/selfks50000.png" align="middle" width="300px"/>
+        <figcaption align="middle">Ks = 50000</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<p>
+  The number of fold decreases as the Ks goes higher. That is because higher Ks will make the cloth less likely to deform and thus harder to fold, 
+  resulting in a fewer number of folds. On the other hand, with low Ks the cloth is quite flexible and easy to fold.
+</p>  
+
+<h2 align="middle">Part V: Cloth Sim</h2>
+<p>
+  A shader program combines a vertex shader and a fragment shader to render realistic material appearances. The vertex shader applies transforms
+  to vertices, modifying their geometric properties like position and normal vectors according to camera views and writes the result to fragment shader.
+  The fragment shader takes in the attributes computed by vertex shader and assigns RGB color value for the pixel based on the interpolated vertex data.
+  Then we are able to create diffrent lighting and meterial effects using different shaders.
+</p>
+<b>Blinn-Phong shading model</b>
+<p>
+  The Blinn-Phong shading model is a specular model with ambient, diffuse and specular contribution. 
+  Ambient light is responsible for simulating global illumination and acts as all indirect light, the diffuse contribution is simple
+  lambertian and the specular part simulates the direct reflection of the light source. By weighing these three contributions we could 
+  simulate the appearance of different meterials.
+</p>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/ambient.png" align="middle" width="400px"/>
+        <figcaption align="middle">ambient only</figcaption>
+      </td>
+      <td>
+        <img src="images/diffuse.png" align="middle" width="400px"/>
+        <figcaption align="middle">diffuse only</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/specular.png" align="middle" width="400px"/>
+        <figcaption align="middle">specular only</figcaption>
+      </td>
+      <td>
+        <img src="images/fullblingphong.png" align="middle" width="400px"/>
+        <figcaption align="middle">entire Blinn-Phong model</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<b>Custom texture</b>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/customtexture.png" align="middle" width="700px"/>
+        <figcaption align="middle">Berkeley seal</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+<b>Bump and Displacement</b>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/16bump.png" align="middle" width="400px"/>
+        <figcaption align="middle">16 bump sphere (coarse)</figcaption>
+      </td>
+      <td>
+        <img src="images/16cloth.png" align="middle" width="400px"/>
+        <figcaption align="middle">16 bump cloth</figcaption>
+      </td>
+    </tr>
+    <br>
+    <tr>
+      <td>
+        <img src="images/16dis.png" align="middle" width="400px"/>
+        <figcaption align="middle">16 displacement sphere (coarse)</figcaption>
+      </td>
+      <td>
+        <img src="images/16clothdis.png" align="middle" width="400px"/>
+        <figcaption align="middle">16 displacement cloth</figcaption>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+    <td>
+      <img src="images/128bump.png" align="middle" width="400px"/>
+      <figcaption align="middle">128 bump sphere</figcaption>
+    </td>
+    <td>
+      <img src="images/128dis.png" align="middle" width="400px"/>
+      <figcaption align="middle">128 displacement sphere</figcaption>
+    </td>
+    </tr>
+  </table>
+</div>
+
+<p>
+  As we can see above, when the sphere is coarse, the performance of displacement is worse than bump: there are some strange blockiness.
+  This is because the fragment shader is interpolating height pertubations from a sparse number of samples which is not enough to match the
+  surface displacement.In contrast, with 128 sample rate, the shader has enough sample to accurately portray the shading as well as the surface deformation of the texture.
+  On the other hand, for the bump, the difference is much smaller. 
+</p>
+
+<b>Mirror shader</b>
+
+<div align="middle">
+	<table style="width=100%">
+	  <tr>
+		<td>
+		  <img src="images/mirrorsphere.png" align="middle" width="400px"/>
+		  <figcaption align="middle">mirror shader on the sphere</figcaption>
+		</td>
+		<td>
+		  <img src="images/mirrorcloth.png" align="middle" width="400px"/>
+		  <figcaption align="middle">mirror shader on the cloth</figcaption>
+		</td>
+	  </tr>
+	</table>
+</div>
+</body>
 </html>
