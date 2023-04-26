@@ -67,7 +67,7 @@
     }
   </style>
 
-  <title>CS 184 Augmented Reality Final Project</title>
+  <title>CS 184 Augmented Reality Final Project Milestone</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
   <!-- Not using below due to lacking bold fontfaces -->
   <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro|Source+Sans+Pro:400,700" rel="stylesheet"> -->
@@ -89,7 +89,7 @@
   style="padding-top: 50px;">
 
   <div align="middle">
-    <img src="https://drive.google.com/uc?id=1DZQwwl_aq1IEPGaZFk4bAYzEJNrqHRN4" 
+    <img src="./images/header.png" 
         align="middle" 
         width="1000vw" />
   </div>
@@ -98,7 +98,7 @@
   <h1 align="left">Final Project: Augmented Reality Rendering (Milestone)</h1>
   <h2 align="left">Yuntian Ke, Calvin Yan, Ruichi Zhang, Wentao Zhang</h2>
 
-  <h2>Summary</h2>
+  <h2>Overview</h2>
   <!-- Provide us a descriptive title, 2-3 sentences that summarize your project, and list your three team members. -->
   <p>Following the tutorial we have found, we have been done with April Tag detection using feature extraction and matching. Then, we successfully
     derived the transformation matrix that is used to transform the reference coordinate to the image coordinate. At last, we could render some simple 
@@ -115,13 +115,9 @@
     <li> It uses the estimated pose to render a scene over the marker in a realistic perspective </li>
   </ol>
 
-
-  <p>So far, for April Tag detection we use feature extration and matching, which find feature matches between the reference surface and the scene.
-    However, sometimes it is not stable and some fluctuation appears. </p>
-    <p>For the trasformation part, according to the pinhole model, since we already have
-    matches between the reference and the scene, we could estimate the transformation matrix using a method called Random Sample Consensus (RANSAC), which
-    interactively select random matches to fit the model and score them to find the best one. Then, we could find the matrix which transfrom the 2D reference image
-    to the scene. </p>
+  <p>
+    We will explain how each of these tasks is performed. First, we elected to use <a href="">ORB</a> for fiducial marker tracking. ORB locates a target image in a scene by identifying high-contrast "keypoints" in the image and scene and computing matches between them (you can see the result of this in the image above.) The second step, pose estimation, computes the translation and rotation of the camera relative to a reference pose in the form of a homography. The homography is estimated using the RANSAC algorithm, which repeatedly samples the point correspondences found by ORB to determine the best estimation and remove outliers. 
+  </p>
     <p>For the next step, we also want to build 3D models on the reference plane. This is equivalent to adding the column for z axis in our
     original transformation matrix. We could use the two column that we already got to estimate the third column for the z axis. Then, we are able
     to render 3D object in our camera.</p>
@@ -133,7 +129,9 @@
     Define how you will measure the quality / performance of your system (e.g. graphs showing speedup, or quantifying accuracy). It may not be possible to define precise target metrics at this time, but we encourage you to try.
     What questions do you plan to answer with your analysis?
     You should break this section into two parts: (1) what you plan to deliver, and (2) what you hope to deliver. In (1), describe what you believe you must accomplish to have a successful project and achieve the grade you expect (i.e. your baseline plan -- planning for some unexpected problems would make sense). In (2), describe what you hope to achieve if things go well and you get ahead of schedule (your aspirational plan). -->
-
+    <p>
+      The below video encapsulates our progress thus far. The fiducial marker, an ArUco tag, is identified, and the model of a fox (without lighting for now) is rendered on top of the marker, using the estimated pose to give the appearance of extending outward from the plane of the marker.
+    </p>
     <div align="middle">
         <table style="width=100%">
           <tr>
@@ -149,13 +147,16 @@
     </table>
   </div>
 
-    <p> As we can see in the video, in most time we could track the April Tag properly, however, sometimes it will still shake.
+    <p> As we can see in the video, in most time we could track the tag properly, however, sometimes it will still shake.
     </p>
     <h2>Updated Plan</h2>
-    <p>First, we want to track the April Tag more stably. Our current marker detection uses ORB, which matches features between an image and a scene. This allows us to use </p>
+    <p>First, we want to track the April Tag more stably. We hope to achieve this by replacing our ORB-based approach with ArUco markers. These are a simplified alternative to QR codes used in a variety of augmented reality and robotics applications:
+    </p>
+    <p>
+       While this restricts us to using ArUco tags for visual positioning, we belive this will be outweighted by the superior robustness and stability of ArUco detection.  </p>
       <p>Then, we want to render some more complex 3D objects, which might require us to use some OpenGL techniques.
     We also want to see if we could render some even more complex AR objects off-line.</p>
-      <p>At last, if we still have time, we want to add some realistic lighting to our AR objects, using some methods like path tracing.</p>
+      <p>At last, if we still have time, we want to add some realistic lighting to our AR objects. Our first goal will be to add point and area light sources to scenes and ensure they illuminate the render as expected. Then, we will explore the use of the camera position as a point light source. Our ultimate stretch goal will be to perform image-based lighting, which estimates environmental lighting in an image and applies it to the render, enhancing realism.</p>
 
     <h2>Slides</h2>
     <p>Our <a href="https://docs.google.com/presentation/d/1apGPSn2C9fNor2S5DpBEfYKLEj-s098NliPQ42KDUFY/edit?usp=sharing">slides </a> provide more examples of our progress and updated plan.
@@ -163,32 +164,44 @@
   <h2>Resources</h2>
   <!-- List what resources, e.g. books, papers and/or online resources that are references for your project. List the computing platform, hardware and software resources that you will use for your project. You have a wide latitude here to use what you have access to, but be aware that you will have to support and trouble-shoot on your platform yourselves. If you are starting from an existing piece of code or system, describe and provide a pointer to it here.
     -->
-    <p>Most of our work so far are based on these two tutorials 
-        <a href="https://pyimagesearch.com/2021/01/04/opencv-augmented-reality-ar/">tutorial1</a> and 
-        <a href="https://bitesofcode.wordpress.com/2017/09/12/augmented-reality-with-python-and-opencv-part-1/">tutorial2</a></p>.
+    <p>Most of our work so far are based on these two tutorials: 
+      <ul>
+        <li> <a href="https://pyimagesearch.com/2021/01/04/opencv-augmented-reality-ar/">2D Augmented Reality with OpenCV using ArUco </a> </li>
+        <li> <a href="https://bitesofcode.wordpress.com/2017/09/12/augmented-reality-with-python-and-opencv-part-1/">3D Augmented Reality with Projective Geometry</a></p> </li>
+      </ul>
   <p>
     Additionally, as before we will use the work of Ian Curtis as a source of aesthetic inspiration for our final product:  <a href="https://twitter.com/XRarchitect">Twitter</a> and <a href="https://www.instagram.com/ianjcurtis/">Instagram</a>
   </p>
   <p>
-    Based on the feedback of course instructors, we will use 
-    Additionally, we will use the accelerated renderer from <a href="https://cal-cs184-student.github.io/project-webpages-sp23-CalvinYan/proj4/index.html">Project 4</a> as a reference for our own real-time rendering engine.
+    Based on the feedback of course instructors, we will use the accelerated renderer from <a href="https://cal-cs184-student.github.io/project-webpages-sp23-CalvinYan/proj4/index.html">Project 4</a> as a reference for our own real-time rendering engine.
   </p>
   <p>
-    Below are some development tools we will explore and possibly use to achieve our goals:
+    Below are some resources we wish to explore for image-based lighting:
     <ul>
       <li>
-        The <a href="https://cal-cs184-student.github.io/project-webpages-sp23-rsha256/proj3-1/index.html">completed path tracer</a> as a baseline for 3D rendering
+        <a href="https://arxiv.org/pdf/2301.05211.pdf">Accidental Light Probes</a>
       </li>
       <li>
-        <a href="https://developers.google.com/ar/develop">Google ARCore</a> for mobile development and AR features like
-        environmental lighting estimation
+        <a href="https://history.siggraph.org/wp-content/uploads/2022/10/2016-Poster-64-Baba_Estimating-Lighting-Environments-Based-on-Shadow-Area-in-an-Omni-Directional-Image.pdf">Estimating Lighting Environments Based on Shadow Area in an Omni-Directional Image</a>
       </li>
       <li>
-        <a href="https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html">OpenCV</a> for fiducial marker 
-        tracking and positioning
+        <a href="https://developer.nvidia.cn/gpugems/gpugems/part-iii-materials/chapter-19-image-based-lighting">
+          Converting images to cubemaps for local reflection
+        </a>
       </li>
     </ul>
-    
+  </p>
+
+  <p>
+    As well as other development resources:
+    <ul>
+      <li>
+        <a href="https://developers.google.com/ar/develop">Google ARCore</a> for mobile development and augmented AR features like environmental lighting estimation
+      </li>
+      <li>
+        <a href="https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html">OpenCV tutorial</a> for fiducial marker tracking and positioning
+      </li>
+    </ul>
   </p>
     
   <hr />
