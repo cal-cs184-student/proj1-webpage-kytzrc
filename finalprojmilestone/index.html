@@ -108,6 +108,14 @@
   <h2>Technical Approach</h2>
   <!-- Here you should provide the context for your idea. Describe the problem that you are trying to solve, why it is 
     important, where it is challenging. Give us a general idea on how you are going to solve it. -->
+  <p> At this stage our project has accomplished three things:</p>
+  <ol>
+    <li> It detects fiducial markers in a live video feed. </li>
+    <li> It estimates the pose of the camera relative to the marker in the scene. </li>
+    <li> It uses the estimated pose to render a scene over the marker in a realistic perspective </li>
+  </ol>
+
+
   <p>So far, for April Tag detection we use feature extration and matching, which find feature matches between the reference surface and the scene.
     However, sometimes it is not stable and some fluctuation appears. </p>
     <p>For the trasformation part, according to the pinhole model, since we already have
@@ -118,13 +126,14 @@
     original transformation matrix. We could use the two column that we already got to estimate the third column for the z axis. Then, we are able
     to render 3D object in our camera.</p>
 
-  <h2>Preliminary Result</h2>
+  <h2>Milestone Video</h2>
   <!-- This is the most important part of your proposal. You should carefully think through what you are trying to accomplish, what results you are going for, and why you think you can accomplish those goals. For example:
     Since this is a graphics class you will likely define the kind of images you will create (e.g. including a photo of a new lighting effect you will simulate).
     If you are working on an interactive system, describe what demo you will create.
     Define how you will measure the quality / performance of your system (e.g. graphs showing speedup, or quantifying accuracy). It may not be possible to define precise target metrics at this time, but we encourage you to try.
     What questions do you plan to answer with your analysis?
     You should break this section into two parts: (1) what you plan to deliver, and (2) what you hope to deliver. In (1), describe what you believe you must accomplish to have a successful project and achieve the grade you expect (i.e. your baseline plan -- planning for some unexpected problems would make sense). In (2), describe what you hope to achieve if things go well and you get ahead of schedule (your aspirational plan). -->
+
     <div align="middle">
         <table style="width=100%">
           <tr>
@@ -143,14 +152,14 @@
     <p> As we can see in the video, in most time we could track the April Tag properly, however, sometimes it will still shake.
     </p>
     <h2>Updated Plan</h2>
-    <p>First, we want to track the April Tag more stably. This might require us to implement a tracking algorithm, which take the previous reference
-      location into consider.</p>
+    <p>First, we want to track the April Tag more stably. Our current marker detection uses ORB, which matches features between an image and a scene. This allows us to use </p>
       <p>Then, we want to render some more complex 3D objects, which might require us to use some OpenGL techniques.
     We also want to see if we could render some even more complex AR objects off-line.</p>
       <p>At last, if we still have time, we want to add some realistic lighting to our AR objects, using some methods like path tracing.</p>
 
     <h2>Slides</h2>
-    <p>Our slides link : https://docs.google.com/presentation/d/1apGPSn2C9fNor2S5DpBEfYKLEj-s098NliPQ42KDUFY/edit?usp=sharing</p>
+    <p>Our <a href="https://docs.google.com/presentation/d/1apGPSn2C9fNor2S5DpBEfYKLEj-s098NliPQ42KDUFY/edit?usp=sharing">slides </a> provide more examples of our progress and updated plan.
+
   <h2>Resources</h2>
   <!-- List what resources, e.g. books, papers and/or online resources that are references for your project. List the computing platform, hardware and software resources that you will use for your project. You have a wide latitude here to use what you have access to, but be aware that you will have to support and trouble-shoot on your platform yourselves. If you are starting from an existing piece of code or system, describe and provide a pointer to it here.
     -->
@@ -158,12 +167,11 @@
         <a href="https://pyimagesearch.com/2021/01/04/opencv-augmented-reality-ar/">tutorial1</a> and 
         <a href="https://bitesofcode.wordpress.com/2017/09/12/augmented-reality-with-python-and-opencv-part-1/">tutorial2</a></p>.
   <p>
-    We will use the work of Ian Curtis, going by the alias "XRArchitect" online, as an (admittedly ambitious) benchmark
-    for the quality of our final product. You can view his work on his <a href="https://twitter.com/XRarchitect">Twitter
-    </a> and <a href="https://www.instagram.com/ianjcurtis/">Instagram</a>.
+    Additionally, as before we will use the work of Ian Curtis as a source of aesthetic inspiration for our final product:  <a href="https://twitter.com/XRarchitect">Twitter</a> and <a href="https://www.instagram.com/ianjcurtis/">Instagram</a>
   </p>
   <p>
-    Additionally, we will use the <a href="https://cal-cs184-student.github.io/project-webpages-sp23-rsha256/proj3-1/index.html">completed path tracer</a> from Project 3-1 as a baseline for 3D rendering.
+    Based on the feedback of course instructors, we will use 
+    Additionally, we will use the accelerated renderer from <a href="https://cal-cs184-student.github.io/project-webpages-sp23-CalvinYan/proj4/index.html">Project 4</a> as a reference for our own real-time rendering engine.
   </p>
   <p>
     Below are some development tools we will explore and possibly use to achieve our goals:
